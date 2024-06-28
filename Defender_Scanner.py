@@ -75,10 +75,8 @@ def split_sample(file_path):
             temp_file.write(sample)
             #denfender_scan(temp_file_path)
             temp_file.close()
+        os.remove(temp_file_path= temp_folder + str(name))
     
-    for file_to_delete in os.listdir(temp_folder):
-        os.remove(file_to_delete)
-
 
 denfender_scan('F:\\C2\\test-sample\\Invoke-Mimikatz.ps1')
 denfender_scan('F:\\C2\\test-sample\\good_file.ps1')
