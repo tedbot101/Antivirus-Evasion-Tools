@@ -1,0 +1,8 @@
+iex -> i'e'x
+[text.encoding]::ASCII -> [text.encoding]::UTF8
+change variable names
+change function names
+
+AMSI does not detect obfuscated script
+
+the defender does by scanning the payload as bytes

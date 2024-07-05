@@ -1,0 +1,9 @@
+ScriptBlock Smuggling
+Reflection ScanContent Change
+Using Hardware Breakpoints
+Using CLR hooking
+Patch the provider’s DLL of Microsoft MpOav.dll
+Scanning Interception and Provider function patching
+
+
+source: https://github.com/S3cur3Th1sSh1t/Amsi-Bypass-Powershell/tree/master?tab=readme-ov-file

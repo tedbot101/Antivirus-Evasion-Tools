@@ -2,6 +2,8 @@ import re
 import subprocess
 import os
 import hashlib
+from itertools import zip_longest
+import concurrent.futures
  
 # encoding GeeksforGeeks using md5 hash
 # function 
@@ -42,14 +44,14 @@ def denfender_scan(path):
 
         if "no threats" in stdout:
             #print("The file '" + path +"' is clean")
-            return
+            return False,'Clean',''
 
         else:
             threat = re.findall('\sthreat\s+:\s+(.*)', stdout)[0]
             #print(stdout)
-            print('Threat: '+threat)
-            split_sample(path)
-            return threat
+            #print('Threat: '+threat)
+            #split_sample(path)
+            return True,threat,path
 
     if stderr:
         print("Standard Error:")
@@ -64,19 +66,82 @@ def split_sample(file_path):
 
     file = open(file_path,'r')
     file = file.read()
-    splited_sample= file.split()
     
-    for sample in splited_sample:
-        # using md5 to generate random hashes for file name
-        name= hashlib.md5(sample.encode()).hexdigest()
+    first_half_length = round(len(file) //2)
+    print( first_half_length)
+    # to save time splitting the file into 2 and scan the malicious part
+    half_split = [file[:first_half_length],file[first_half_length:]]
+    for part in half_split:
+        name= hashlib.md5(part.encode()).hexdigest()
         temp_file_path= temp_folder + str(name)
-        #print(temp_file)
         with open(temp_file_path,'w') as temp_file:
-            temp_file.write(sample)
-            #denfender_scan(temp_file_path)
-            temp_file.close()
-        os.remove(temp_file_path= temp_folder + str(name))
-    
+            temp_file.write(part)
+            found, threat,path = denfender_scan(temp_file_path)
+            if threat:
+                print('Found threat in part' + half_split.index(part))
+                part = file
+                break
 
-denfender_scan('F:\\C2\\test-sample\\Invoke-Mimikatz.ps1')
-denfender_scan('F:\\C2\\test-sample\\good_file.ps1')
+    # split the part into 2 again
+    second_half_length = round(len(file) //2)
+    half_split = [file[:second_half_length ],file[second_half_length:]]
+    for part in half_split:
+        name= hashlib.md5(part.encode()).hexdigest()
+        temp_file_path= temp_folder + str(name)
+        found, threat,path = denfender_scan(temp_file_path)
+        if threat:
+            part = file
+            break
+
+    # splitting the sample into 64 char size
+    splited_sample = split_to_chunck(file,64)
+
+
+    print(len(splited_sample))
+    try:
+        for sample in splited_sample:
+            # using md5 to generate random hashes for file name
+            name= hashlib.md5(sample.encode()).hexdigest()
+            temp_file_path= temp_folder + str(name)
+            #print(temp_file)
+            with open(temp_file_path,'w') as temp_file:
+                temp_file.write(sample)
+                found, threat,path = denfender_scan(temp_file_path)
+                if found:
+                    print('Threat : ' + threat)
+                    #print('Detected btyes : ' + sample)
+
+                temp_file.close()
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
+            else:
+                continue
+
+    except Exception as err:
+        print(err)
+
+def fun(n, i, value=None):
+    # size is chunk size
+    # https://pythonguides.com/split-a-string-at-every-nth-character-in-python/
+    args = [iter(i)] * n
+    return zip_longest(fillvalue=value, *args)
+
+def split_to_chunck(data,size):
+    op_str = [''.join(l) for l in fun(size, data, '')]
+    op = []
+    for a in op_str:
+        op.append(a)
+    return op
+
+def scan(file):
+    found,threat,path=denfender_scan(file)
+    if found:
+        print('Threat Found : ' + threat)
+        print('Spliting and scanning the sample...')
+        split_sample(path)
+    
+bad_file='F:\\C2\\test-sample\\Invoke-Mimikatz.ps1'
+bad_file='F:\\C2\\test-sample\\bad.ps1'
+good_file='F:\\C2\\test-sample\\good_file.ps1'
+
+scan(bad_file)

